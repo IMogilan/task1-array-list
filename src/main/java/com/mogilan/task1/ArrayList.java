@@ -11,11 +11,10 @@ import java.util.Objects;
  * of this ArrayList.</p>
  *
  * <p>The main field of ArrayList is field elements, which represent an array that store all the elements
- * of this ArrayList. </p>
- * <p>Constructor without parameters creates an ArrayList with empty array for elements field. In this case,
- * to save space, the field elements is assigned the value of the static field EMPTY_ELEMENTS.</p>
- * <p>Creating an ArrayList it's possible to specify in constructor initialCapacity, which creates for elements
- * field an array with length equal to this initialCapacity.</p>
+ * of this ArrayList.</p>
+ * <p>Constructor without parameters creates an ArrayList with length of array of the field elements equal to
+ * DEFAULT_CAPACITY. Creating an ArrayList it's possible to specify in constructor initialCapacity, which creates for
+ * elements field an array with length equal to this initialCapacity.</p>
  * <p>Capacity corresponds to the length of array of the field elements, but does not correspond to the number
  * of elements in this ArrayList. The number of elements in this ArrayList is stored in the field size.</p>
  * <p>If the length of the array elements is not enough to perform operations on elements of this ArrayList
@@ -31,19 +30,14 @@ import java.util.Objects;
 public class ArrayList<E> implements List<E> {
 
     /**
-     * Initial capacity that is used to expand an empty array of the field elements when the first element is added.
-     */
-    private static final int DEFAULT_CAPACITY = 10;
-
-    /**
-     * An empty shared array, which, in order to save space, is assigned to the elements field in
-     * the following cases:
+     * Initial capacity that is used:
      * <ul>
-     *     <li>creating an ArrayList using a constructor without parameters; </li>
-     *     <li>clearing an ArrayList using the clear() method.</li>
+     *     <li>in constructor without parameters to create an ArrayList with length of array of the field elements
+     *     equal to DEFAULT_CAPACITY;</li>
+     *     <li>to expand an empty array of the field elements when the first element is added.</li>
      * </ul>
      */
-    private static final Object[] EMPTY_ELEMENTS = {};
+    private static final int DEFAULT_CAPACITY = 10;
 
     /**
      * <p>The array into which the elements of the ArrayList are stored.</p>
@@ -57,11 +51,10 @@ public class ArrayList<E> implements List<E> {
     private int size;
 
     /**
-     * Creates an ArrayList with empty array for elements field. In this case, to save space, the field elements
-     * is assigned the value of the static field EMPTY_ELEMENTS
+     * Creates an ArrayList with length of array of the field elements equal to DEFAULT_CAPACITY
      */
     public ArrayList() {
-        elements = EMPTY_ELEMENTS;
+        elements = new Object[DEFAULT_CAPACITY];
     }
 
     /**
@@ -92,19 +85,27 @@ public class ArrayList<E> implements List<E> {
      * Adds the element passed in the parameters to this ArrayList at the specified index.
      * <p>All elements of this ArrayList, from the specified index and to the end of the entire ArrayList,
      * are moved to the right on one position.</p>
+     * <p>Allows to add element to 0 (zero) index even if size of ArrayList == 0, i.e. in case if
+     * {@code ((size() == 0) && (index == 0))} </p>
      * <p>If the capacity is not enough to perform addition, before performing of such operation a new array of a larger
      * size is created by methods moveElementsRightFromIndex(int index) and all elements are copied from the old array
      * into a new one. The old array is subsequently destroyed by the garbage collector</p>
      *
      * @param index   index at which the element should be inserted
      * @param element element to be added to this list
-     * @throws IndexOutOfBoundsException if the index is out of range
-     *                                   ({@code index < 0 || index >= size()})
+     * @throws IndexOutOfBoundsException if {@code ((size() == 0) && (index != 0))}, or if index is out of range
+     *                                   {@code (index < 0 || index >= size())}
      */
 
     @Override
     public void add(int index, E element) {
-        Objects.checkIndex(index, size);
+        if (size == 0) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+        } else {
+            Objects.checkIndex(index, size);
+        }
         moveElementsRightFromIndex(index);
         elements[index] = element;
         size++;
@@ -112,11 +113,12 @@ public class ArrayList<E> implements List<E> {
 
     /**
      * Removes all elements from this ArrayList and set the size as 0.
-     * <p>In order to save space, the array of the field elements is assigned to EMPTY_ELEMENTS.</p>
      */
     @Override
     public void clear() {
-        elements = EMPTY_ELEMENTS;
+        for (int i = 0; i < size; i++) {
+            elements[i] = null;
+        }
         size = 0;
     }
 

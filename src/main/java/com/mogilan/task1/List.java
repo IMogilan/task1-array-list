@@ -32,11 +32,13 @@ public interface List<E> {
      * Adds the element passed in the parameters to this list at the specified index.
      * <p>All elements of this list, from the specified index and to the end of the entire list,
      * are moved to the right on one position.</p>
+     * <p>Allows to add element to 0 (zero) index even if size of List == 0, i.e. in case if
+     * {@code ((size() == 0) && (index == 0))}  </p>
      *
      * @param index   index at which the element should be inserted
      * @param element element to be added to this list
-     * @throws IndexOutOfBoundsException if the index is out of range
-     *                                   ({@code index < 0 || index >= size()})
+     * @throws IndexOutOfBoundsException if {@code ((size() == 0) && (index != 0))}, or if index is out of range
+     *                                   {@code (index < 0 || index >= size())}
      */
     void add(int index, E element);
 

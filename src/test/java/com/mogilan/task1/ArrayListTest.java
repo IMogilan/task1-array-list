@@ -1,6 +1,5 @@
 package com.mogilan.task1;
 
-import com.mogilan.task1.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ class ArrayListTest {
     class AddTest {
 
         @ParameterizedTest
-        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddSuccessTest")
+        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddSuccessWhenDefaultCapacityTest")
         void addSuccessWhenDefaultCapacity(int numberOfElements, Integer[] expectingElements) {
             populateListWithElements(integerArrayList, numberOfElements);
 
@@ -44,9 +43,8 @@ class ArrayListTest {
         }
 
         @ParameterizedTest
-        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddSuccessTest")
-        void addSuccessWhenInitialCapacity(int numberOfElements, Integer[] expectingElements) {
-            int initialCapacity = 5;
+        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddSuccessWhenInitialCapacityTest")
+        void addSuccessWhenInitialCapacity(int initialCapacity, int numberOfElements, Integer[] expectingElements) {
             var arrayList = new ArrayList<Integer>(initialCapacity);
             populateListWithElements(arrayList, numberOfElements);
 
@@ -66,6 +64,33 @@ class ArrayListTest {
 
             assertThat(integerArrayList.size()).isEqualTo(elements.length + 1);
             assertThat(integerArrayList.get(index)).isEqualTo(newElement);
+            assertThat(actualElementsAfterAddition).isEqualTo(expectingElements);
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddOnZeroIndexSuccessWhenDefaultCapacity")
+        void addOnZeroIndexSuccessWhenDefaultCapacity(Integer[] elements, Integer[] expectingElements) {
+            for (int i = 0; i < elements.length; i++) {
+                integerArrayList.add(0, elements[i]);
+            }
+
+            var actualElementsAfterAddition = getElementsArrayFrom(integerArrayList);
+
+            assertThat(integerArrayList.size()).isEqualTo(elements.length);
+            assertThat(actualElementsAfterAddition).isEqualTo(expectingElements);
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.mogilan.task1.ArrayListTest#getArgumentsForAddOnZeroIndexSuccessWhenInitialCapacity")
+        void addOnZeroIndexSuccessWhenInitialCapacity(int initialCapacity, Integer[] elements, Integer[] expectingElements) {
+            var arrayList = new ArrayList<Integer>(initialCapacity);
+            for (int i = 0; i < elements.length; i++) {
+                arrayList.add(0, elements[i]);
+            }
+
+            var actualElementsAfterAddition = getElementsArrayFrom(arrayList);
+
+            assertThat(arrayList.size()).isEqualTo(elements.length);
             assertThat(actualElementsAfterAddition).isEqualTo(expectingElements);
         }
 
@@ -283,7 +308,6 @@ class ArrayListTest {
 
     static Stream<Arguments> getArgumentsForCheckingExceptionIfIndexIncorrect() {
         return Stream.of(
-                Arguments.of(0, 0),
                 Arguments.of(0, -1),
                 Arguments.of(0, 1),
                 Arguments.of(5, 10),
@@ -293,7 +317,7 @@ class ArrayListTest {
         );
     }
 
-    static Stream<Arguments> getArgumentsForAddSuccessTest() {
+    static Stream<Arguments> getArgumentsForAddSuccessWhenDefaultCapacityTest() {
         return Stream.of(
                 Arguments.of(1, new Integer[]{0}),
                 Arguments.of(5, new Integer[]{0, 1, 2, 3, 4}),
@@ -301,6 +325,17 @@ class ArrayListTest {
                 Arguments.of(15, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}),
                 Arguments.of(20, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}),
                 Arguments.of(30, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29})
+        );
+    }
+
+    static Stream<Arguments> getArgumentsForAddSuccessWhenInitialCapacityTest() {
+        return Stream.of(
+                Arguments.of(0, 1, new Integer[]{0}),
+                Arguments.of(5, 5, new Integer[]{0, 1, 2, 3, 4}),
+                Arguments.of(10, 10, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
+                Arguments.of(50, 15, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}),
+                Arguments.of(100, 20, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}),
+                Arguments.of(1000, 30, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29})
         );
     }
 
@@ -341,6 +376,25 @@ class ArrayListTest {
                         14,
                         1000,
                         new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1000, 14, 15, 16, 17, 18, 19})
+        );
+    }
+
+    static Stream<Arguments> getArgumentsForAddOnZeroIndexSuccessWhenDefaultCapacity() {
+        return Stream.of(
+                Arguments.of(new Integer[]{0}, new Integer[]{0}),
+                Arguments.of(new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, new Integer[]{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}),
+                Arguments.of(new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, new Integer[]{19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0})
+        );
+    }
+
+    static Stream<Arguments> getArgumentsForAddOnZeroIndexSuccessWhenInitialCapacity() {
+        return Stream.of(
+                Arguments.of(0, new Integer[]{0}, new Integer[]{0}),
+                Arguments.of(5, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, new Integer[]{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}),
+                Arguments.of(10, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, new Integer[]{19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0}),
+                Arguments.of(20, new Integer[]{0}, new Integer[]{0}),
+                Arguments.of(50, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, new Integer[]{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}),
+                Arguments.of(100, new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, new Integer[]{19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0})
         );
     }
 
